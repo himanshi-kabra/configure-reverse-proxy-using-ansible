@@ -1,0 +1,36 @@
+- hosts: webserver
+  tasks:
+  - name: "install httpd rpm"
+    package:
+      name: "httpd"
+  - copy: 
+      dest: "/var/www/html/index.html"
+      content: "For Load balancer testing"
+  - service:
+      name: "httpd"
+      state: restarted
+  - name: "Creating a firewall rule"
+    firewalld:
+      port: "80/tcp"
+      permanent: true
+      immediate: true
+      state: enabled
+
+- hosts: haproxy
+  tasks:
+  - name: "install LB software"
+    package:
+      name: "haproxy"
+  - template:
+      dest: "/etc/haproxy/haproxy.cfg"
+      src: "haproxy.cfg"
+  - service:
+      name: "haproxy"
+      state: restarted
+  - name: "Creating a firewall rule"
+    firewalld:
+      port: "8080/tcp"
+      permanent: true
+      immediate: true
+      state: enabled
+
